@@ -1,5 +1,8 @@
 #[cfg(test)]
 mod tests_simple_struct {
+    use strum_macros::EnumIter;
+    use strum_macros::AsRefStr;
+    use strum_macros::EnumString;
     use field_accessor::FieldAccessor;
 
     #[derive(FieldAccessor)]
@@ -92,6 +95,9 @@ mod tests_simple_struct {
 
 #[cfg(test)]
 mod test_mem {
+    use strum_macros::EnumIter;
+    use strum_macros::AsRefStr;
+    use strum_macros::EnumString;
     use field_accessor::FieldAccessor;
 
     #[derive(FieldAccessor)]
@@ -150,6 +156,9 @@ mod test_mem {
 
 #[cfg(test)]
 mod tests_vector_type {
+    use strum_macros::EnumIter;
+    use strum_macros::AsRefStr;
+    use strum_macros::EnumString;
     use field_accessor::FieldAccessor;
 
     #[derive(FieldAccessor)]
@@ -178,7 +187,9 @@ mod tests_vector_type {
 
 #[cfg(test)]
 mod tests_getstructinfo {
-
+    use strum_macros::EnumIter;
+    use strum_macros::AsRefStr;
+    use strum_macros::EnumString;
     use field_accessor::FieldAccessor;
 
     #[derive(FieldAccessor)]
@@ -208,8 +219,11 @@ mod tests_getstructinfo {
 
 #[cfg(test)]
 mod tests_multiple_derive {
+    use strum_macros::EnumIter;
+    use strum_macros::AsRefStr;
+    use strum_macros::EnumString;
 
-    #[test]
+#[test]
     fn test_multiple_derive() {
         use field_accessor::FieldAccessor;
 
@@ -227,8 +241,11 @@ mod tests_multiple_derive {
 
 #[cfg(test)]
 mod tests_nested_structs {
+    use strum_macros::EnumIter;
+    use strum_macros::AsRefStr;
+    use strum_macros::EnumString;
 
-    #[test]
+#[test]
     fn test_nested_structs() {
         use field_accessor::FieldAccessor;
 
@@ -256,6 +273,38 @@ mod tests_nested_structs {
         let field_name = "name".to_string();
         let name: &String = my_user.get(&field_name).unwrap();
         let userdata: &UserData = my_user.get(&"data".to_string()).unwrap();
+        assert_eq!(*name, "aGoodName".to_string());
+        assert_eq!(*userdata.some_field, "some value".to_string());
+    }
+
+    #[test]
+    fn test_field_names() {
+        use field_accessor::FieldAccessor;
+
+        // Todo Find an elegant way to use FieldAccessor without passing these traits to derive.
+        #[derive(PartialEq, PartialOrd, Default, Clone, Debug)]
+        pub struct UserData {
+            some_field: String,
+            some_value: i32,
+        }
+
+        #[derive(FieldAccessor)]
+        pub struct User {
+            name: String,
+            data: UserData,
+        }
+
+        let user_data = UserData {
+            some_field: "some value".to_string(),
+            some_value: 123,
+        };
+        let my_user = User {
+            name: "aGoodName".to_string(),
+            data: user_data,
+        };
+        let field_name = UserFieldNames::name.as_ref().to_string();
+        let name: &String = my_user.get(&field_name).unwrap();
+        let userdata: &UserData = my_user.get(&UserFieldNames::data.as_ref().to_string()).unwrap();
         assert_eq!(*name, "aGoodName".to_string());
         assert_eq!(*userdata.some_field, "some value".to_string());
     }

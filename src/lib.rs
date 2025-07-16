@@ -9,11 +9,12 @@ pub fn derive(input: TokenStream) -> TokenStream {
     let output = match data {
         syn::Data::Struct(s) => match s.fields {
             syn::Fields::Named(FieldsNamed { named, .. }) => {
-                let idents_enum = named.iter().map(|f| &f.ident);
+                let idents_enum: Vec<_> = named.iter().map(|f| &f.ident).collect();
                 let idents_getenum = idents_enum.clone();
                 let tys_enum = named.iter().map(|f| &f.ty);
                 let tys_for_structinfo = tys_enum.clone();
                 let enumname = format_ident!("{}{}", ident, "FieldEnum");
+                let fieldnames = format_ident!("{}{}", ident, "FieldNames");
                 let structinfo = format_ident!("{}{}", ident, "StructInfo");
                 let gettersetter = format_ident!("{}{}", ident, "GetterSetter");
 
@@ -119,6 +120,12 @@ pub fn derive(input: TokenStream) -> TokenStream {
                     #[allow(non_camel_case_types)]
                     enum #enumname{
                         #(#idents_enum(#tys_enum)),*
+                    }
+
+                    #[derive(EnumString, AsRefStr, EnumIter, PartialOrd, Ord, Hash, Clone, Eq, PartialEq, Debug)]
+                    #[allow(non_camel_case_types)]
+                    pub enum #fieldnames{
+                        #(#idents_enum),*
                     }
 
                     trait #gettersetter<T> {
