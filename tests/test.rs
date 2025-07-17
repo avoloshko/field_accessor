@@ -1,9 +1,8 @@
 #[cfg(test)]
 mod tests_simple_struct {
-    use strum_macros::EnumIter;
+    use field_accessor::FieldAccessor;
     use strum_macros::AsRefStr;
     use strum_macros::EnumString;
-    use field_accessor::FieldAccessor;
 
     #[derive(FieldAccessor)]
     pub struct Dog {
@@ -95,10 +94,9 @@ mod tests_simple_struct {
 
 #[cfg(test)]
 mod test_mem {
-    use strum_macros::EnumIter;
+    use field_accessor::FieldAccessor;
     use strum_macros::AsRefStr;
     use strum_macros::EnumString;
-    use field_accessor::FieldAccessor;
 
     #[derive(FieldAccessor)]
     pub struct Dog {
@@ -156,10 +154,9 @@ mod test_mem {
 
 #[cfg(test)]
 mod tests_vector_type {
-    use strum_macros::EnumIter;
+    use field_accessor::FieldAccessor;
     use strum_macros::AsRefStr;
     use strum_macros::EnumString;
-    use field_accessor::FieldAccessor;
 
     #[derive(FieldAccessor)]
     pub struct Dog {
@@ -187,10 +184,9 @@ mod tests_vector_type {
 
 #[cfg(test)]
 mod tests_getstructinfo {
-    use strum_macros::EnumIter;
+    use field_accessor::FieldAccessor;
     use strum_macros::AsRefStr;
     use strum_macros::EnumString;
-    use field_accessor::FieldAccessor;
 
     #[derive(FieldAccessor)]
     pub struct Dog {
@@ -219,11 +215,10 @@ mod tests_getstructinfo {
 
 #[cfg(test)]
 mod tests_multiple_derive {
-    use strum_macros::EnumIter;
     use strum_macros::AsRefStr;
     use strum_macros::EnumString;
 
-#[test]
+    #[test]
     fn test_multiple_derive() {
         use field_accessor::FieldAccessor;
 
@@ -241,11 +236,11 @@ mod tests_multiple_derive {
 
 #[cfg(test)]
 mod tests_nested_structs {
-    use strum_macros::EnumIter;
+    use strum::IntoEnumIterator;
     use strum_macros::AsRefStr;
     use strum_macros::EnumString;
 
-#[test]
+    #[test]
     fn test_nested_structs() {
         use field_accessor::FieldAccessor;
 
@@ -302,10 +297,12 @@ mod tests_nested_structs {
             name: "aGoodName".to_string(),
             data: user_data,
         };
-        let field_name = UserFieldNames::name.as_ref().to_string();
+        let field_name = UserFields::name.as_ref().to_string();
         let name: &String = my_user.get(&field_name).unwrap();
-        let userdata: &UserData = my_user.get(&UserFieldNames::data.as_ref().to_string()).unwrap();
+        let userdata: &UserData = my_user.get(&UserFields::data.as_ref().to_string()).unwrap();
         assert_eq!(*name, "aGoodName".to_string());
         assert_eq!(*userdata.some_field, "some value".to_string());
+
+        assert_eq!(UserFields::iter().collect::<Vec<_>>().len(), UserTypes.len());
     }
 }

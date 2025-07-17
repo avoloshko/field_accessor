@@ -11,10 +11,12 @@ pub fn derive(input: TokenStream) -> TokenStream {
             syn::Fields::Named(FieldsNamed { named, .. }) => {
                 let idents_enum: Vec<_> = named.iter().map(|f| &f.ident).collect();
                 let idents_getenum = idents_enum.clone();
-                let tys_enum = named.iter().map(|f| &f.ty);
+                let tys_enum: Vec<_> = named.iter().map(|f| &f.ty).collect();;
                 let tys_for_structinfo = tys_enum.clone();
                 let enumname = format_ident!("{}{}", ident, "FieldEnum");
-                let fieldnames = format_ident!("{}{}", ident, "FieldNames");
+                let enumfields = format_ident!("{}{}", ident, "Fields");
+                let typeslist = format_ident!("{}{}", ident, "Types");
+                let field_count = tys_for_structinfo.len();
                 let structinfo = format_ident!("{}{}", ident, "StructInfo");
                 let gettersetter = format_ident!("{}{}", ident, "GetterSetter");
 
@@ -124,9 +126,13 @@ pub fn derive(input: TokenStream) -> TokenStream {
 
                     #[derive(EnumString, AsRefStr, EnumIter, PartialOrd, Ord, Hash, Clone, Eq, PartialEq, Debug)]
                     #[allow(non_camel_case_types)]
-                    pub enum #fieldnames{
+                    pub enum #enumfields{
                         #(#idents_enum),*
                     }
+
+                    pub const #typeslist: [&'static str; #field_count] = [
+                        #(stringify!(#tys_for_structinfo)),*
+                    ];
 
                     trait #gettersetter<T> {
                         fn get(&self, field_string: &str) -> Result<&T, String>;
