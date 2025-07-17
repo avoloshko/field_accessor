@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod tests_simple_struct {
-    use field_accessor::FieldAccessor;
+    use strum_macros::EnumIter;
+use field_accessor::FieldAccessor;
     use strum_macros::AsRefStr;
     use strum_macros::EnumString;
 
@@ -94,7 +95,8 @@ mod tests_simple_struct {
 
 #[cfg(test)]
 mod test_mem {
-    use field_accessor::FieldAccessor;
+    use strum_macros::EnumIter;
+use field_accessor::FieldAccessor;
     use strum_macros::AsRefStr;
     use strum_macros::EnumString;
 
@@ -154,7 +156,8 @@ mod test_mem {
 
 #[cfg(test)]
 mod tests_vector_type {
-    use field_accessor::FieldAccessor;
+    use strum_macros::EnumIter;
+use field_accessor::FieldAccessor;
     use strum_macros::AsRefStr;
     use strum_macros::EnumString;
 
@@ -184,7 +187,8 @@ mod tests_vector_type {
 
 #[cfg(test)]
 mod tests_getstructinfo {
-    use field_accessor::FieldAccessor;
+    use strum_macros::EnumIter;
+use field_accessor::FieldAccessor;
     use strum_macros::AsRefStr;
     use strum_macros::EnumString;
 
@@ -215,7 +219,8 @@ mod tests_getstructinfo {
 
 #[cfg(test)]
 mod tests_multiple_derive {
-    use strum_macros::AsRefStr;
+    use strum_macros::EnumIter;
+use strum_macros::AsRefStr;
     use strum_macros::EnumString;
 
     #[test]
@@ -236,7 +241,8 @@ mod tests_multiple_derive {
 
 #[cfg(test)]
 mod tests_nested_structs {
-    use strum::IntoEnumIterator;
+    use strum_macros::EnumIter;
+use strum::IntoEnumIterator;
     use strum_macros::AsRefStr;
     use strum_macros::EnumString;
 
@@ -303,6 +309,6 @@ mod tests_nested_structs {
         assert_eq!(*name, "aGoodName".to_string());
         assert_eq!(*userdata.some_field, "some value".to_string());
 
-        assert_eq!(UserFields::iter().collect::<Vec<_>>().len(), UserTypes.len());
+        assert_eq!(UserFields::iter().collect::<Vec<_>>().len(), UserTypeList.len());
     }
 }

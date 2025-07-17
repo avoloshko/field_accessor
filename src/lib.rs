@@ -15,10 +15,50 @@ pub fn derive(input: TokenStream) -> TokenStream {
                 let tys_for_structinfo = tys_enum.clone();
                 let enumname = format_ident!("{}{}", ident, "FieldEnum");
                 let enumfields = format_ident!("{}{}", ident, "Fields");
-                let typeslist = format_ident!("{}{}", ident, "Types");
+                let typeslist = format_ident!("{}{}", ident, "TypeList");
+                let enumtypes = format_ident!("{}{}", ident, "Types");
                 let field_count = tys_for_structinfo.len();
                 let structinfo = format_ident!("{}{}", ident, "StructInfo");
                 let gettersetter = format_ident!("{}{}", ident, "GetterSetter");
+
+                let mut unique_types = vec![];
+                for ty in named.iter().map(|f| &f.ty) {
+                    if !unique_types.iter().any(|t| *t == ty) {
+                        unique_types.push(ty);
+                    }
+                }
+
+                let sanitize_type_for_variant = |ty: &&syn::Type| {
+                    let ty_str = quote!(#ty).to_string();
+                    let sanitized_body = ty_str
+                        .replace(" ", "")
+                        .replace("::", "_")
+                        .replace("<", "Of")
+                        .replace(">", "")
+                        .replace(",", "And")
+                        .replace("(", "")
+                        .replace(")", "")
+                        .replace("[", "ArrayOf")
+                        .replace("]", "")
+                        .replace(";", "Len")
+                        .replace("->", "Returns")
+                        .replace("&", "Ref")
+                        .replace("'", "");
+                    format_ident!("Type_{}", sanitized_body)
+                };
+
+                let enumtype_variants: Vec<_> = unique_types
+                    .iter()
+                    .map(sanitize_type_for_variant)
+                    .collect();
+
+                let typeslist_values: Vec<_> = tys_for_structinfo
+                    .iter()
+                    .map(|field_ty| {
+                        let variant_ident = sanitize_type_for_variant(&field_ty);
+                        quote! { #enumtypes::#variant_ident }
+                    })
+                    .collect();
 
                 let mut get_quotes = vec![];
                 let mut get_mut_quotes = vec![];
@@ -124,14 +164,19 @@ pub fn derive(input: TokenStream) -> TokenStream {
                         #(#idents_enum(#tys_enum)),*
                     }
 
+                    #[derive(Debug, Clone)]
+                    pub enum #enumtypes {
+                        #(#enumtype_variants),*
+                    }
+
                     #[derive(EnumString, AsRefStr, EnumIter, PartialOrd, Ord, Hash, Clone, Eq, PartialEq, Debug)]
                     #[allow(non_camel_case_types)]
                     pub enum #enumfields{
                         #(#idents_enum),*
                     }
 
-                    pub const #typeslist: [&'static str; #field_count] = [
-                        #(stringify!(#tys_for_structinfo)),*
+                    pub const #typeslist: [#enumtypes; #field_count] = [
+                        #(#typeslist_values),*
                     ];
 
                     trait #gettersetter<T> {
